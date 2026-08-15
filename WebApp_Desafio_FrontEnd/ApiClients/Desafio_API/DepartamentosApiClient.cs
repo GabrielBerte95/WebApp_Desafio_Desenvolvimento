@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using WebApp_Desafio_FrontEnd.ViewModels;
 
@@ -9,6 +9,9 @@ namespace WebApp_Desafio_FrontEnd.ApiClients.Desafio_API
         private const string tokenAutenticacao = "AEEFC184-9F62-4B3E-BB93-BE42BF0FFA36";
 
         private const string departamentosListUrl = "api/Departamentos/Listar";
+        private const string departamentosObterUrl = "api/Departamentos/Obter";
+        private const string departamentosGravarUrl = "api/Departamentos/Gravar";
+        private const string departamentosExcluirUrl = "api/Departamentos/Excluir";
 
         private string desafioApiUrl = "https://localhost:44388/"; // Endereço API IIS-Express
 
@@ -33,6 +36,64 @@ namespace WebApp_Desafio_FrontEnd.ApiClients.Desafio_API
             string json = base.ReadHttpWebResponseMessage(response);
 
             return JsonConvert.DeserializeObject<List<DepartamentoViewModel>>(json);
+        }
+
+        public DepartamentoViewModel DepartamentoObter(int idDepartamento)
+        {
+            var headers = new Dictionary<string, object>()
+            {
+                { "TokenAutenticacao", tokenAutenticacao }
+            };
+
+            var querys = new Dictionary<string, object>()
+            {
+                { "idDepartamento", idDepartamento }
+            };
+
+            var response = base.Get($"{desafioApiUrl}{departamentosObterUrl}", querys, headers);
+
+            base.EnsureSuccessStatusCode(response);
+
+            string json = base.ReadHttpWebResponseMessage(response);
+
+            return JsonConvert.DeserializeObject<DepartamentoViewModel>(json);
+        }
+
+        public bool DepartamentoGravar(DepartamentoViewModel departamento)
+        {
+            var headers = new Dictionary<string, object>()
+            {
+                { "TokenAutenticacao", tokenAutenticacao }
+            };
+
+            var response = base.Post($"{desafioApiUrl}{departamentosGravarUrl}", departamento, headers);
+
+            base.EnsureSuccessStatusCode(response);
+
+            string json = base.ReadHttpWebResponseMessage(response);
+
+            return JsonConvert.DeserializeObject<bool>(json);
+        }
+
+        public bool DepartamentoExcluir(int idDepartamento)
+        {
+            var headers = new Dictionary<string, object>()
+            {
+                { "TokenAutenticacao", tokenAutenticacao }
+            };
+
+            var querys = new Dictionary<string, object>()
+            {
+                { "idDepartamento", idDepartamento }
+            };
+
+            var response = base.Delete($"{desafioApiUrl}{departamentosExcluirUrl}", querys, headers);
+
+            base.EnsureSuccessStatusCode(response);
+
+            string json = base.ReadHttpWebResponseMessage(response);
+
+            return JsonConvert.DeserializeObject<bool>(json);
         }
     }
 }

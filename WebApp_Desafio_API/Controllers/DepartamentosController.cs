@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -41,6 +41,99 @@ namespace WebApp_Desafio_API.Controllers
                           };
 
                 return Ok(lst);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(422, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(DepartamentoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [Route("Obter")]
+        public IActionResult Obter([FromQuery] int idDepartamento)
+        {
+            try
+            {
+                var _departamento = this.bll.ObterDepartamento(idDepartamento);
+
+                var departamento = new DepartamentoResponse()
+                                    {
+                                        id = _departamento.ID,
+                                        descricao = _departamento.Descricao
+                                    };
+
+                return Ok(departamento);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(422, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [Route("Gravar")]
+        public IActionResult Gravar([FromBody] DepartamentoRequest request)
+        {
+            try
+            {
+                if (request == null)
+                    throw new ArgumentNullException("Request não informado.");
+
+                var resultado = this.bll.GravarDepartamento(request.id, request.descricao);
+
+                return Ok(resultado);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ApplicationException ex)
+            {
+                return StatusCode(422, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        [Route("Excluir")]
+        public IActionResult Excluir([FromRoute] int idDepartamento)
+        {
+            try
+            {
+                var resultado = this.bll.ExcluirDepartamento(idDepartamento);
+
+                return Ok(resultado);
             }
             catch (ArgumentException ex)
             {
