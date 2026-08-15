@@ -16,11 +16,15 @@ namespace WebApp_Desafio_BackEnd.Models
         public int ID { get; set; }
 
         [Required(ErrorMessage = "O Assunto é obrigatório")]
+        [StringLength(150, ErrorMessage = "O Assunto deve ter no máximo {1} caracteres")]
         public string Assunto { get; set; }
 
         [Required(ErrorMessage = "O Solicitante é obrigatório")]
+        [StringLength(100, ErrorMessage = "O Solicitante deve ter no máximo {1} caracteres")]
         public string Solicitante { get; set; }
 
+        [Required(ErrorMessage = "O Departamento é obrigatório")]
+        [Range(1, int.MaxValue, ErrorMessage = "O Departamento é obrigatório")]
         public int IdDepartamento { get; set; }
         public string Departamento { get; set; }
 
