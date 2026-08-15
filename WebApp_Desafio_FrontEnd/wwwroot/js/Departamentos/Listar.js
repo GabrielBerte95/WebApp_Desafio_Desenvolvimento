@@ -23,6 +23,14 @@ $(document).ready(function () {
         }
     });
 
+    $('#dataTables-Departamentos tbody').on('dblclick', 'tr', function () {
+        var data = table.row(this).data();
+        if (!data || !data.ID) {
+            return;
+        }
+        window.location.href = config.contextPath + 'Departamentos/Editar/' + data.ID;
+    });
+
     $('#btnRelatorio').click(function () {
         window.location.href = config.contextPath + 'Departamentos/Report';
     });
