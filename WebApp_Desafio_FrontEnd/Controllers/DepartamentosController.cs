@@ -1,13 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
 using System;
+using System.IO;
 using WebApp_Desafio_FrontEnd.ApiClients.Desafio_API;
 using WebApp_Desafio_FrontEnd.ViewModels;
 using WebApp_Desafio_FrontEnd.ViewModels.Enums;
+using AspNetCore.Reporting;
 
 namespace WebApp_Desafio_FrontEnd.Controllers
 {
     public class DepartamentosController : Controller
     {
+        private readonly IHostingEnvironment _hostEnvironment;
+
+        public DepartamentosController(IHostingEnvironment hostEnvironment)
+        {
+            _hostEnvironment = hostEnvironment;
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -114,6 +124,24 @@ namespace WebApp_Desafio_FrontEnd.Controllers
             {
                 return BadRequest(new ResponseViewModel(ex));
             }
+        }
+
+        [HttpGet]
+        public IActionResult Report()
+        {
+            string contentRootPath = _hostEnvironment.ContentRootPath;
+            string path = Path.Combine(contentRootPath, "wwwroot", "reports", "rptDepartamentos.rdlc");
+
+            LocalReport localReport = new LocalReport(path);
+
+            var departamentosApiClient = new DepartamentosApiClient();
+            var lstDepartamentos = departamentosApiClient.DepartamentosListar();
+
+            localReport.AddDataSource("dsDepartamentos", lstDepartamentos);
+
+            ReportResult reportResult = localReport.Execute(RenderType.Pdf);
+
+            return File(reportResult.MainStream, "application/octet-stream", "rptDepartamentos.pdf");
         }
     }
 }
