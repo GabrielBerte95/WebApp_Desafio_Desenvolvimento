@@ -15,14 +15,20 @@ namespace WebApp_Desafio_FrontEnd.ViewModels
         [DataMember(Name = "ID")]
         public int ID { get; set; }
 
+        [Required(ErrorMessage = "O Assunto é obrigatório")]
+        [StringLength(150, ErrorMessage = "O Assunto deve ter no máximo {1} caracteres")]
         [Display(Name = "Assunto")]
         [DataMember(Name = "Assunto")]
         public string Assunto { get; set; }
 
+        [Required(ErrorMessage = "O Solicitante é obrigatório")]
+        [StringLength(100, ErrorMessage = "O Solicitante deve ter no máximo {1} caracteres")]
         [Display(Name = "Solicitante")]
         [DataMember(Name = "Solicitante")]
         public string Solicitante { get; set; }
 
+        [Required(ErrorMessage = "O Departamento é obrigatório")]
+        [Range(1, int.MaxValue, ErrorMessage = "Selecione um Departamento")]
         [Display(Name = "IdDepartamento")]
         [DataMember(Name = "IdDepartamento")]
         public int IdDepartamento { get; set; }
@@ -31,6 +37,7 @@ namespace WebApp_Desafio_FrontEnd.ViewModels
         [DataMember(Name = "Departamento")]
         public string Departamento { get; set; }
 
+        [Required(ErrorMessage = "A Data de Abertura é obrigatória")]
         [Display(Name = "DataAbertura")]
         [DataMember(Name = "DataAbertura")]
         public DateTime DataAbertura { get; set; }

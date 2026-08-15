@@ -82,6 +82,12 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         [HttpPost]
         public IActionResult Cadastrar(ChamadoViewModel chamadoVM)
         {
+            if (!ModelState.IsValid)
+            {
+                var mensagem = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).FirstOrDefault();
+                return BadRequest(new ResponseViewModel(mensagem ?? "Dados inválidos.", AlertTypes.warning));
+            }
+
             try
             {
                 var chamadosApiClient = new ChamadosApiClient();

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.IO;
+using System.Linq;
 using WebApp_Desafio_FrontEnd.ApiClients.Desafio_API;
 using WebApp_Desafio_FrontEnd.ViewModels;
 using WebApp_Desafio_FrontEnd.ViewModels.Enums;
@@ -65,6 +66,12 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         [HttpPost]
         public IActionResult Cadastrar(DepartamentoViewModel departamentoVM)
         {
+            if (!ModelState.IsValid)
+            {
+                var mensagem = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).FirstOrDefault();
+                return BadRequest(new ResponseViewModel(mensagem ?? "Dados inválidos.", AlertTypes.warning));
+            }
+
             try
             {
                 var departamentosApiClient = new DepartamentosApiClient();
