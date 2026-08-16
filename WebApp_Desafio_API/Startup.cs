@@ -46,6 +46,12 @@ namespace WebApp_Desafio_API
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
                 .AddJsonOptions(options => options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter()));
 
+            // Injeção de dependência das camadas de acesso a dados e regras de negócio
+            services.AddScoped<WebApp_Desafio_BackEnd.DataAccess.ChamadosDAL>();
+            services.AddScoped<WebApp_Desafio_BackEnd.DataAccess.DepartamentosDAL>();
+            services.AddScoped<WebApp_Desafio_BackEnd.Business.ChamadosBLL>();
+            services.AddScoped<WebApp_Desafio_BackEnd.Business.DepartamentosBLL>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.

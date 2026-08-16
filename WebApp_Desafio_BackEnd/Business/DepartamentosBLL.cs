@@ -9,8 +9,14 @@ namespace WebApp_Desafio_BackEnd.Business
 {
     public class DepartamentosBLL
     {
-        private DepartamentosDAL dal = new DepartamentosDAL();
-        private ChamadosDAL chamadosDal = new ChamadosDAL();
+        private readonly DepartamentosDAL dal;
+        private readonly ChamadosDAL chamadosDal;
+
+        public DepartamentosBLL(DepartamentosDAL dal, ChamadosDAL chamadosDal)
+        {
+            this.dal = dal;
+            this.chamadosDal = chamadosDal;
+        }
 
         public IEnumerable<Departamento> ListarDepartamentos()
         {

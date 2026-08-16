@@ -9,7 +9,12 @@ namespace WebApp_Desafio_BackEnd.Business
 {
     public class ChamadosBLL
     {
-        private ChamadosDAL dal = new ChamadosDAL();
+        private readonly ChamadosDAL dal;
+
+        public ChamadosBLL(ChamadosDAL dal)
+        {
+            this.dal = dal;
+        }
 
         public IEnumerable<Chamado> ListarChamados()
         {

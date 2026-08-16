@@ -15,7 +15,12 @@ namespace WebApp_Desafio_API.Controllers
     [Route("api/[controller]")]
     public class DepartamentosController : Controller
     {
-        private DepartamentosBLL bll = new DepartamentosBLL();
+        private readonly DepartamentosBLL bll;
+
+        public DepartamentosController(DepartamentosBLL bll)
+        {
+            this.bll = bll;
+        }
 
         /// <summary>
         /// Lista todos os departamento
