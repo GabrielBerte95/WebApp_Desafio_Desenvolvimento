@@ -25,7 +25,10 @@
             <div class="row">
                 <div class="form-group col-lg-7 col-md-6 col-sm-12">
                     <label class="form-label" asp-for="Solicitante"></label>
-                    <input type="text" class="form-control" asp-for="Solicitante">
+                    <div class="autocomplete-wrapper">
+                        <input type="text" class="form-control" asp-for="Solicitante" autocomplete="off">
+                        <ul class="list-group autocomplete-list" id="listaSolicitantes"></ul>
+                    </div>
                     <span class="text-danger" asp-validation-for="Solicitante"></span>
                 </div>
             </div>
@@ -84,6 +87,31 @@
     <link rel="stylesheet" href="~/lib/sweetalert2/sweetalert2.min.css" />
     @*<link rel="stylesheet" href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker.min.css" />*@
     @*<link rel="stylesheet" href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" />*@
+    <style>
+        .autocomplete-wrapper {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            margin-top: -1px;
+        }
+
+        .autocomplete-list .list-group-item {
+            cursor: pointer;
+        }
+
+        .autocomplete-list .list-group-item:hover,
+        .autocomplete-list .list-group-item.active {
+            background-color: #f5f5f5;
+        }
+    </style>
 }
 
 @section scripts
