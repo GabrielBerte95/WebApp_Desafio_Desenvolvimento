@@ -20,7 +20,7 @@ namespace WebApp_Desafio_BackEnd.DataAccess
                 using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
                 {
 
-                    dbCommand.CommandText = "SELECT * FROM departamentos ";
+                    dbCommand.CommandText = "SELECT ID, Descricao FROM departamentos ";
 
                     dbConnection.Open();
 
@@ -58,8 +58,10 @@ namespace WebApp_Desafio_BackEnd.DataAccess
                 using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
                 {
                     dbCommand.CommandText =
-                        "SELECT * FROM departamentos " +
-                        $"WHERE ID = {idDepartamento}";
+                        "SELECT ID, Descricao FROM departamentos " +
+                        "WHERE ID = @ID";
+
+                    dbCommand.Parameters.AddWithValue("@ID", idDepartamento);
 
                     dbConnection.Open();
 
@@ -128,7 +130,8 @@ namespace WebApp_Desafio_BackEnd.DataAccess
             {
                 using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
                 {
-                    dbCommand.CommandText = $"DELETE FROM departamentos WHERE ID = {idDepartamento}";
+                    dbCommand.CommandText = "DELETE FROM departamentos WHERE ID = @ID";
+                    dbCommand.Parameters.AddWithValue("@ID", idDepartamento);
 
                     dbConnection.Open();
                     regsAfetados = dbCommand.ExecuteNonQuery();
