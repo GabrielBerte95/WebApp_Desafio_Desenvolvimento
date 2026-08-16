@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using WebApp_Desafio_API.Extensions;
 using WebApp_Desafio_API.ViewModels;
 using WebApp_Desafio_BackEnd.Business;
 
@@ -51,17 +52,9 @@ namespace WebApp_Desafio_API.Controllers
 
                 return Ok(lst);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(422, ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return this.ExceptionProcess(ex);
             }
         }
 
@@ -94,17 +87,9 @@ namespace WebApp_Desafio_API.Controllers
 
                 return Ok(chamado);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(422, ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return this.ExceptionProcess(ex);
             }
         }
 
@@ -132,17 +117,9 @@ namespace WebApp_Desafio_API.Controllers
 
                 return Ok(resultado);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(422, ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return this.ExceptionProcess(ex);
             }
         }
         
@@ -163,17 +140,9 @@ namespace WebApp_Desafio_API.Controllers
 
                 return Ok(resultado);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ApplicationException ex)
-            {
-                return StatusCode(422, ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return this.ExceptionProcess(ex);
             }
         }
     }

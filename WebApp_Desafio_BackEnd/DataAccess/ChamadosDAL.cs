@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebApp_Desafio_BackEnd.Models;
 
 namespace WebApp_Desafio_BackEnd.DataAccess
@@ -13,200 +9,89 @@ namespace WebApp_Desafio_BackEnd.DataAccess
     {
         private const string ANSI_DATE_FORMAT = "yyyy-MM-dd";
 
-        public IEnumerable<Chamado> ListarChamados()
+        private const string SELECT_CHAMADOS =
+            "SELECT chamados.ID, " +
+            "       Assunto, " +
+            "       Solicitante, " +
+            "       IdDepartamento, " +
+            "       departamentos.Descricao AS Departamento, " +
+            "       DataAbertura " +
+            "FROM chamados " +
+            "INNER JOIN departamentos " +
+            "   ON chamados.IdDepartamento = departamentos.ID ";
+
+        private static Chamado MapChamado(SQLiteDataReader dataReader)
         {
-            IList<Chamado> lstChamados = new List<Chamado>();
+            var chamado = new Chamado();
 
-            DataTable dtChamados = new DataTable();
-
-            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
-            {
-                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
-                {
-
-                    dbCommand.CommandText = 
-                        "SELECT chamados.ID, " + 
-                        "       Assunto, " +
-                        "       Solicitante, " +
-                        "       IdDepartamento, " +
-                        "       departamentos.Descricao AS Departamento, " + 
-                        "       DataAbertura " + 
-                        "FROM chamados " + 
-                        "INNER JOIN departamentos " +
-                        "   ON chamados.IdDepartamento = departamentos.ID ";
-
-                    dbConnection.Open();
-
-                    using (SQLiteDataReader dataReader = dbCommand.ExecuteReader())
-                    {
-                        var chamado = Chamado.Empty;
-
-                        while (dataReader.Read())
-                        {
-                            chamado = new Chamado();
-
-                            if (!dataReader.IsDBNull(0))
-                                chamado.ID = dataReader.GetInt32(0);
-                            if (!dataReader.IsDBNull(1))
-                                chamado.Assunto = dataReader.GetString(1);
-                            if (!dataReader.IsDBNull(2))
-                                chamado.Solicitante = dataReader.GetString(2);
-                            if (!dataReader.IsDBNull(3))
-                                chamado.IdDepartamento = dataReader.GetInt32(3);
-                            if (!dataReader.IsDBNull(4))
-                                chamado.Departamento = dataReader.GetString(4);
-                            if (!dataReader.IsDBNull(5))
-                                chamado.DataAbertura = DateTime.Parse(dataReader.GetString(5));
-
-                            lstChamados.Add(chamado);
-                        }
-                        dataReader.Close();
-                    }
-                    dbConnection.Close();
-                }
-
-            }
-
-            return lstChamados;
-        }
-
-        public Chamado ObterChamado(int idChamado)
-        {
-            var chamado = Chamado.Empty;
-
-            DataTable dtChamados = new DataTable();
-
-            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
-            {
-                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
-                {
-                    dbCommand.CommandText =
-                        "SELECT chamados.ID, " +
-                        "       Assunto, " +
-                        "       Solicitante, " +
-                        "       IdDepartamento, " +
-                        "       departamentos.Descricao AS Departamento, " +
-                        "       DataAbertura " +
-                        "FROM chamados " +
-                        "INNER JOIN departamentos " +
-                        "   ON chamados.IdDepartamento = departamentos.ID " +
-                        "WHERE chamados.ID = @ID";
-
-                    dbCommand.Parameters.AddWithValue("@ID", idChamado);
-
-                    dbConnection.Open();
-
-                    using (SQLiteDataReader dataReader = dbCommand.ExecuteReader())
-                    {
-                        if (dataReader.Read())
-                        {
-                            chamado = new Chamado();
-
-                            if (!dataReader.IsDBNull(0))
-                                chamado.ID = dataReader.GetInt32(0);
-                            if (!dataReader.IsDBNull(1))
-                                chamado.Assunto = dataReader.GetString(1);
-                            if (!dataReader.IsDBNull(2))
-                                chamado.Solicitante = dataReader.GetString(2);
-                            if (!dataReader.IsDBNull(3))
-                                chamado.IdDepartamento = dataReader.GetInt32(3);
-                            if (!dataReader.IsDBNull(4))
-                                chamado.Departamento = dataReader.GetString(4);
-                            if (!dataReader.IsDBNull(5))
-                                chamado.DataAbertura = DateTime.Parse(dataReader.GetString(5));
-
-                        }
-                        dataReader.Close();
-                    }
-                    dbConnection.Close();
-                }
-
-            }
+            if (!dataReader.IsDBNull(0))
+                chamado.ID = dataReader.GetInt32(0);
+            if (!dataReader.IsDBNull(1))
+                chamado.Assunto = dataReader.GetString(1);
+            if (!dataReader.IsDBNull(2))
+                chamado.Solicitante = dataReader.GetString(2);
+            if (!dataReader.IsDBNull(3))
+                chamado.IdDepartamento = dataReader.GetInt32(3);
+            if (!dataReader.IsDBNull(4))
+                chamado.Departamento = dataReader.GetString(4);
+            if (!dataReader.IsDBNull(5))
+                chamado.DataAbertura = DateTime.Parse(dataReader.GetString(5));
 
             return chamado;
         }
 
+        public IEnumerable<Chamado> ListarChamados()
+        {
+            return ExecuteReader(SELECT_CHAMADOS, MapChamado);
+        }
+
+        public Chamado ObterChamado(int idChamado)
+        {
+            return ExecuteReaderSingle(
+                SELECT_CHAMADOS + "WHERE chamados.ID = @ID",
+                MapChamado,
+                Chamado.Empty,
+                cmd => cmd.Parameters.AddWithValue("@ID", idChamado));
+        }
+
         public bool GravarChamado(int ID, string Assunto, string Solicitante, int IdDepartamento, DateTime DataAbertura)
         {
-            int regsAfetados = -1;
+            string commandText = (ID == 0)
+                ? "INSERT INTO chamados (Assunto,Solicitante,IdDepartamento,DataAbertura)" +
+                  "VALUES (@Assunto,@Solicitante,@IdDepartamento,@DataAbertura)"
+                : "UPDATE chamados " +
+                  "SET Assunto=@Assunto, " +
+                  "    Solicitante=@Solicitante, " +
+                  "    IdDepartamento=@IdDepartamento, " +
+                  "    DataAbertura=@DataAbertura " +
+                  "WHERE ID=@ID ";
 
-            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
+            int regsAfetados = ExecuteNonQuery(commandText, cmd =>
             {
-                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
-                {
-                    if (ID == 0)
-                    {
-                        dbCommand.CommandText = 
-                            "INSERT INTO chamados (Assunto,Solicitante,IdDepartamento,DataAbertura)" +
-                            "VALUES (@Assunto,@Solicitante,@IdDepartamento,@DataAbertura)";
-                    }
-                    else
-                    {
-                        dbCommand.CommandText = 
-                            "UPDATE chamados " + 
-                            "SET Assunto=@Assunto, " + 
-                            "    Solicitante=@Solicitante, " +
-                            "    IdDepartamento=@IdDepartamento, " + 
-                            "    DataAbertura=@DataAbertura " + 
-                            "WHERE ID=@ID ";
-                    }
-
-                    dbCommand.Parameters.AddWithValue("@Assunto", Assunto);
-                    dbCommand.Parameters.AddWithValue("@Solicitante", Solicitante);
-                    dbCommand.Parameters.AddWithValue("@IdDepartamento", IdDepartamento);
-                    dbCommand.Parameters.AddWithValue("@DataAbertura", DataAbertura.ToString(ANSI_DATE_FORMAT));
-                    dbCommand.Parameters.AddWithValue("@ID", ID);
-
-                    dbConnection.Open();
-                    regsAfetados = dbCommand.ExecuteNonQuery();
-                    dbConnection.Close();
-                }
-
-            }
+                cmd.Parameters.AddWithValue("@Assunto", Assunto);
+                cmd.Parameters.AddWithValue("@Solicitante", Solicitante);
+                cmd.Parameters.AddWithValue("@IdDepartamento", IdDepartamento);
+                cmd.Parameters.AddWithValue("@DataAbertura", DataAbertura.ToString(ANSI_DATE_FORMAT));
+                cmd.Parameters.AddWithValue("@ID", ID);
+            });
 
             return (regsAfetados > 0);
-
         }
 
         public bool ExcluirChamado(int idChamado)
         {
-            int regsAfetados = -1;
-
-            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
-            {
-                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
-                {
-                    dbCommand.CommandText = "DELETE FROM chamados WHERE ID = @ID";
-                    dbCommand.Parameters.AddWithValue("@ID", idChamado);
-
-                    dbConnection.Open();
-                    regsAfetados = dbCommand.ExecuteNonQuery();
-                    dbConnection.Close();
-
-                }
-
-            }
+            int regsAfetados = ExecuteNonQuery(
+                "DELETE FROM chamados WHERE ID = @ID",
+                cmd => cmd.Parameters.AddWithValue("@ID", idChamado));
 
             return (regsAfetados > 0);
         }
 
         public bool ExisteChamadoPorDepartamento(int idDepartamento)
         {
-            int total = 0;
-
-            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
-            {
-                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
-                {
-                    dbCommand.CommandText = "SELECT COUNT(*) FROM chamados WHERE IdDepartamento = @IdDepartamento";
-                    dbCommand.Parameters.AddWithValue("@IdDepartamento", idDepartamento);
-
-                    dbConnection.Open();
-                    total = Convert.ToInt32(dbCommand.ExecuteScalar());
-                    dbConnection.Close();
-                }
-
-            }
+            int total = ExecuteScalarInt(
+                "SELECT COUNT(*) FROM chamados WHERE IdDepartamento = @IdDepartamento",
+                cmd => cmd.Parameters.AddWithValue("@IdDepartamento", idDepartamento));
 
             return total > 0;
         }
