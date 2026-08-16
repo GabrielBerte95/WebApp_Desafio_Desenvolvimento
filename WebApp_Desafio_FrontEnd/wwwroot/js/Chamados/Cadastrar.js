@@ -10,9 +10,7 @@
         language: 'pt-BR'
     };
 
-    if (parseInt($('#ID').val()) === 0) {
-        datepickerOptions.startDate = '0d';
-    }
+    datepickerOptions.startDate = '0d';
 
     $('.glyphicon-calendar').closest("div.date").datepicker(datepickerOptions);
 
