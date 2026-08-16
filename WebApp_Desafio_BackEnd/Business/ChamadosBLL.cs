@@ -37,6 +37,9 @@ namespace WebApp_Desafio_BackEnd.Business
             if (!Validator.TryValidateObject(chamado, new ValidationContext(chamado), validationResults, true))
                 throw new ArgumentException(string.Join(" ", validationResults.Select(r => r.ErrorMessage)));
 
+            if (ID == 0 && DataAbertura.Date < DateTime.Today)
+                throw new ArgumentException("A Data de Abertura não pode ser retroativa.");
+
             return dal.GravarChamado(ID, Assunto, Solicitante, IdDepartamento, DataAbertura);
         }
 
