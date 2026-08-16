@@ -57,6 +57,29 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         }
 
         [HttpGet]
+        public IActionResult SolicitantesAutocomplete()
+        {
+            try
+            {
+                var chamadosApiClient = new ChamadosApiClient();
+                var lstChamados = chamadosApiClient.ChamadosListar();
+
+                var lstSolicitantes = lstChamados
+                    .Select(c => c.Solicitante)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Distinct()
+                    .OrderBy(s => s)
+                    .ToList();
+
+                return Ok(lstSolicitantes);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResponseViewModel(ex));
+            }
+        }
+
+        [HttpGet]
         public IActionResult Cadastrar()
         {
             var chamadoVM = new ChamadoViewModel()
