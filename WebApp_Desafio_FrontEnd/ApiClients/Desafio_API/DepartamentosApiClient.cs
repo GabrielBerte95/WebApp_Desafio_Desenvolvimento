@@ -6,18 +6,18 @@ namespace WebApp_Desafio_FrontEnd.ApiClients.Desafio_API
 {
     public class DepartamentosApiClient : BaseClient
     {
-        private const string tokenAutenticacao = "AEEFC184-9F62-4B3E-BB93-BE42BF0FFA36";
-
         private const string departamentosListUrl = "api/Departamentos/Listar";
         private const string departamentosObterUrl = "api/Departamentos/Obter";
         private const string departamentosGravarUrl = "api/Departamentos/Gravar";
         private const string departamentosExcluirUrl = "api/Departamentos/Excluir";
 
-        private string desafioApiUrl = "https://localhost:44388/"; // Endereço API IIS-Express
+        private readonly string desafioApiUrl;
+        private readonly string tokenAutenticacao;
 
-        public DepartamentosApiClient() : base()
+        public DepartamentosApiClient(string desafioApiUrl, string tokenAutenticacao) : base()
         {
-            //TODO
+            this.desafioApiUrl = desafioApiUrl;
+            this.tokenAutenticacao = tokenAutenticacao;
         }
 
         public List<DepartamentoViewModel> DepartamentosListar()

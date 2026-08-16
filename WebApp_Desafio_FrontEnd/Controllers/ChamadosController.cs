@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,10 +16,22 @@ namespace WebApp_Desafio_FrontEnd.Controllers
     public class ChamadosController : Controller
     {
         private readonly IHostingEnvironment _hostEnvironment;
+        private readonly IConfiguration _configuration;
 
-        public ChamadosController(IHostingEnvironment hostEnvironment)
+        public ChamadosController(IHostingEnvironment hostEnvironment, IConfiguration configuration)
         {
             _hostEnvironment = hostEnvironment;
+            _configuration = configuration;
+        }
+
+        private ChamadosApiClient CriarChamadosApiClient()
+        {
+            return new ChamadosApiClient(_configuration["DesafioApi:BaseUrl"], _configuration["DesafioApi:TokenAutenticacao"]);
+        }
+
+        private DepartamentosApiClient CriarDepartamentosApiClient()
+        {
+            return new DepartamentosApiClient(_configuration["DesafioApi:BaseUrl"], _configuration["DesafioApi:TokenAutenticacao"]);
         }
 
         [HttpGet]
@@ -39,7 +52,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         {
             try
             {
-                var chamadosApiClient = new ChamadosApiClient();
+                var chamadosApiClient = CriarChamadosApiClient();
                 var lstChamados = chamadosApiClient.ChamadosListar();
 
                 var dataTableVM = new DataTableAjaxViewModel()
@@ -61,7 +74,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         {
             try
             {
-                var chamadosApiClient = new ChamadosApiClient();
+                var chamadosApiClient = CriarChamadosApiClient();
                 var lstChamados = chamadosApiClient.ChamadosListar();
 
                 var lstSolicitantes = lstChamados
@@ -90,7 +103,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
 
             try
             {
-                var departamentosApiClient = new DepartamentosApiClient();
+                var departamentosApiClient = CriarDepartamentosApiClient();
 
                 ViewData["ListaDepartamentos"] = departamentosApiClient.DepartamentosListar();
             }
@@ -113,7 +126,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
 
             try
             {
-                var chamadosApiClient = new ChamadosApiClient();
+                var chamadosApiClient = CriarChamadosApiClient();
                 var realizadoComSucesso = chamadosApiClient.ChamadoGravar(chamadoVM);
 
                 if (realizadoComSucesso)
@@ -138,10 +151,10 @@ namespace WebApp_Desafio_FrontEnd.Controllers
 
             try
             {
-                var chamadosApiClient = new ChamadosApiClient();
+                var chamadosApiClient = CriarChamadosApiClient();
                 var chamadoVM = chamadosApiClient.ChamadoObter(id);
 
-                var departamentosApiClient = new DepartamentosApiClient();
+                var departamentosApiClient = CriarDepartamentosApiClient();
                 ViewData["ListaDepartamentos"] = departamentosApiClient.DepartamentosListar();
 
                 return View("Cadastrar", chamadoVM);
@@ -157,7 +170,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         {
             try
             {
-                var chamadosApiClient = new ChamadosApiClient();
+                var chamadosApiClient = CriarChamadosApiClient();
                 var realizadoComSucesso = chamadosApiClient.ChamadoExcluir(id);
 
                 if (realizadoComSucesso)
@@ -188,7 +201,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
             LocalReport localReport = new LocalReport(path);
 
             // Carrega os dados que serão apresentados no relatório
-            var chamadosApiClient = new ChamadosApiClient();
+            var chamadosApiClient = CriarChamadosApiClient();
             var lstChamados = chamadosApiClient.ChamadosListar();
 
             localReport.AddDataSource("dsChamados", lstChamados);

@@ -6,18 +6,18 @@ namespace WebApp_Desafio_FrontEnd.ApiClients.Desafio_API
 {
     public class ChamadosApiClient : BaseClient
     {
-        private const string tokenAutenticacao = "AEEFC184-9F62-4B3E-BB93-BE42BF0FFA36";
-
         private const string chamadosListUrl = "api/Chamados/Listar";
         private const string chamadosObterUrl = "api/Chamados/Obter";
         private const string chamadosGravarUrl = "api/Chamados/Gravar";
         private const string chamadosExcluirUrl = "api/Chamados/Excluir";
 
-        private string desafioApiUrl = "https://localhost:44388/"; // Endereço API IIS-Express
+        private readonly string desafioApiUrl;
+        private readonly string tokenAutenticacao;
 
-        public ChamadosApiClient() : base()
+        public ChamadosApiClient(string desafioApiUrl, string tokenAutenticacao) : base()
         {
-            //TODO
+            this.desafioApiUrl = desafioApiUrl;
+            this.tokenAutenticacao = tokenAutenticacao;
         }
 
         public List<ChamadoViewModel> ChamadosListar()

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using System.Linq;
@@ -13,10 +14,17 @@ namespace WebApp_Desafio_FrontEnd.Controllers
     public class DepartamentosController : Controller
     {
         private readonly IHostingEnvironment _hostEnvironment;
+        private readonly IConfiguration _configuration;
 
-        public DepartamentosController(IHostingEnvironment hostEnvironment)
+        public DepartamentosController(IHostingEnvironment hostEnvironment, IConfiguration configuration)
         {
             _hostEnvironment = hostEnvironment;
+            _configuration = configuration;
+        }
+
+        private DepartamentosApiClient CriarDepartamentosApiClient()
+        {
+            return new DepartamentosApiClient(_configuration["DesafioApi:BaseUrl"], _configuration["DesafioApi:TokenAutenticacao"]);
         }
 
         [HttpGet]
@@ -37,7 +45,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         {
             try
             {
-                var departamentosApiClient = new DepartamentosApiClient();
+                var departamentosApiClient = CriarDepartamentosApiClient();
                 var lstDepartamentos = departamentosApiClient.DepartamentosListar();
 
                 var dataTableVM = new DataTableAjaxViewModel()
@@ -74,7 +82,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
 
             try
             {
-                var departamentosApiClient = new DepartamentosApiClient();
+                var departamentosApiClient = CriarDepartamentosApiClient();
                 var realizadoComSucesso = departamentosApiClient.DepartamentoGravar(departamentoVM);
 
                 if (realizadoComSucesso)
@@ -99,7 +107,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
 
             try
             {
-                var departamentosApiClient = new DepartamentosApiClient();
+                var departamentosApiClient = CriarDepartamentosApiClient();
                 var departamentoVM = departamentosApiClient.DepartamentoObter(id);
 
                 return View("Cadastrar", departamentoVM);
@@ -115,7 +123,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
         {
             try
             {
-                var departamentosApiClient = new DepartamentosApiClient();
+                var departamentosApiClient = CriarDepartamentosApiClient();
                 var realizadoComSucesso = departamentosApiClient.DepartamentoExcluir(id);
 
                 if (realizadoComSucesso)
@@ -141,7 +149,7 @@ namespace WebApp_Desafio_FrontEnd.Controllers
 
             LocalReport localReport = new LocalReport(path);
 
-            var departamentosApiClient = new DepartamentosApiClient();
+            var departamentosApiClient = CriarDepartamentosApiClient();
             var lstDepartamentos = departamentosApiClient.DepartamentosListar();
 
             localReport.AddDataSource("dsDepartamentos", lstDepartamentos);
