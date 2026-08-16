@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
 
-    $('.glyphicon-calendar').closest("div.date").datepicker({
+    let datepickerOptions = {
         todayBtn: "linked",
         keyboardNavigation: false,
         forceParse: false,
@@ -8,7 +8,13 @@
         format: 'dd/mm/yyyy',
         autoclose: true,
         language: 'pt-BR'
-    });
+    };
+
+    if (parseInt($('#ID').val()) === 0) {
+        datepickerOptions.startDate = '0d';
+    }
+
+    $('.glyphicon-calendar').closest("div.date").datepicker(datepickerOptions);
 
     $('#btnCancelar').click(function () {
         Swal.fire({
@@ -50,10 +56,12 @@
                 });
 
             },
-            error: function (result) {
+            error: function (jqXHR) {
+
+                let mensagem = (jqXHR.responseJSON && jqXHR.responseJSON.Message) || jqXHR.responseText || "Ocorreu um erro ao processar a solicitação.";
 
                 Swal.fire({
-                    text: result,
+                    text: mensagem,
                     confirmButtonText: 'OK',
                     icon: 'error'
                 });
