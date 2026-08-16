@@ -1,145 +1,62 @@
-using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebApp_Desafio_BackEnd.Models;
 
 namespace WebApp_Desafio_BackEnd.DataAccess
 {
     public class DepartamentosDAL : BaseDAL
     {
-        public IEnumerable<Departamento> ListarDepartamentos()
+        private const string SELECT_DEPARTAMENTOS = "SELECT ID, Descricao FROM departamentos ";
+
+        private static Departamento MapDepartamento(SQLiteDataReader dataReader)
         {
-            IList<Departamento> lstDepartamentos = new List<Departamento>();
+            var departamento = new Departamento();
 
-            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
-            {
-                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
-                {
-
-                    dbCommand.CommandText = "SELECT ID, Descricao FROM departamentos ";
-
-                    dbConnection.Open();
-
-                    using (SQLiteDataReader dataReader = dbCommand.ExecuteReader())
-                    {
-                        var departamento = Departamento.Empty;
-
-                        while (dataReader.Read())
-                        {
-                            departamento = new Departamento();
-
-                            if (!dataReader.IsDBNull(0))
-                                departamento.ID = dataReader.GetInt32(0);
-                            if (!dataReader.IsDBNull(1))
-                                departamento.Descricao = dataReader.GetString(1);
-
-                            lstDepartamentos.Add(departamento);
-                        }
-                        dataReader.Close();
-                    }
-                    dbConnection.Close();
-                }
-
-            }
-
-            return lstDepartamentos;
-        }
-
-        public Departamento ObterDepartamento(int idDepartamento)
-        {
-            var departamento = Departamento.Empty;
-
-            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
-            {
-                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
-                {
-                    dbCommand.CommandText =
-                        "SELECT ID, Descricao FROM departamentos " +
-                        "WHERE ID = @ID";
-
-                    dbCommand.Parameters.AddWithValue("@ID", idDepartamento);
-
-                    dbConnection.Open();
-
-                    using (SQLiteDataReader dataReader = dbCommand.ExecuteReader())
-                    {
-                        if (dataReader.Read())
-                        {
-                            departamento = new Departamento();
-
-                            if (!dataReader.IsDBNull(0))
-                                departamento.ID = dataReader.GetInt32(0);
-                            if (!dataReader.IsDBNull(1))
-                                departamento.Descricao = dataReader.GetString(1);
-                        }
-                        dataReader.Close();
-                    }
-                    dbConnection.Close();
-                }
-
-            }
+            if (!dataReader.IsDBNull(0))
+                departamento.ID = dataReader.GetInt32(0);
+            if (!dataReader.IsDBNull(1))
+                departamento.Descricao = dataReader.GetString(1);
 
             return departamento;
         }
 
+        public IEnumerable<Departamento> ListarDepartamentos()
+        {
+            return ExecuteReader(SELECT_DEPARTAMENTOS, MapDepartamento);
+        }
+
+        public Departamento ObterDepartamento(int idDepartamento)
+        {
+            return ExecuteReaderSingle(
+                SELECT_DEPARTAMENTOS + "WHERE ID = @ID",
+                MapDepartamento,
+                Departamento.Empty,
+                cmd => cmd.Parameters.AddWithValue("@ID", idDepartamento));
+        }
+
         public bool GravarDepartamento(int ID, string Descricao)
         {
-            int regsAfetados = -1;
+            string commandText = (ID == 0)
+                ? "INSERT INTO departamentos (Descricao)" +
+                  "VALUES (@Descricao)"
+                : "UPDATE departamentos " +
+                  "SET Descricao=@Descricao " +
+                  "WHERE ID=@ID ";
 
-            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
+            int regsAfetados = ExecuteNonQuery(commandText, cmd =>
             {
-                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
-                {
-                    if (ID == 0)
-                    {
-                        dbCommand.CommandText =
-                            "INSERT INTO departamentos (Descricao)" +
-                            "VALUES (@Descricao)";
-                    }
-                    else
-                    {
-                        dbCommand.CommandText =
-                            "UPDATE departamentos " +
-                            "SET Descricao=@Descricao " +
-                            "WHERE ID=@ID ";
-                    }
-
-                    dbCommand.Parameters.AddWithValue("@Descricao", Descricao);
-                    dbCommand.Parameters.AddWithValue("@ID", ID);
-
-                    dbConnection.Open();
-                    regsAfetados = dbCommand.ExecuteNonQuery();
-                    dbConnection.Close();
-                }
-
-            }
+                cmd.Parameters.AddWithValue("@Descricao", Descricao);
+                cmd.Parameters.AddWithValue("@ID", ID);
+            });
 
             return (regsAfetados > 0);
-
         }
 
         public bool ExcluirDepartamento(int idDepartamento)
         {
-            int regsAfetados = -1;
-
-            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
-            {
-                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
-                {
-                    dbCommand.CommandText = "DELETE FROM departamentos WHERE ID = @ID";
-                    dbCommand.Parameters.AddWithValue("@ID", idDepartamento);
-
-                    dbConnection.Open();
-                    regsAfetados = dbCommand.ExecuteNonQuery();
-                    dbConnection.Close();
-
-                }
-
-            }
+            int regsAfetados = ExecuteNonQuery(
+                "DELETE FROM departamentos WHERE ID = @ID",
+                cmd => cmd.Parameters.AddWithValue("@ID", idDepartamento));
 
             return (regsAfetados > 0);
         }
