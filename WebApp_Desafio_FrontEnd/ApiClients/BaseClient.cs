@@ -180,10 +180,27 @@ namespace WebApp_Desafio_FrontEnd.ApiClients
 
         protected HttpWebResponse Delete(string url, Dictionary<string, object> queries = null, Dictionary<string, object> headers = null)
         {
-            var webRequest = this.CreateWebRequest(ref url, queries, headers);
-            webRequest.Method = "DELETE";
+            try
+            {
+                var webRequest = this.CreateWebRequest(ref url, queries, headers);
+                webRequest.Method = "DELETE";
 
-            return (HttpWebResponse)webRequest.GetResponse();
+                return (HttpWebResponse)webRequest.GetResponse();
+            }
+            catch (WebException e) when (e.Status == WebExceptionStatus.ProtocolError)
+            {
+                WebResponse errResp = ((WebException)e).Response;
+
+                string responseMessage = string.Empty;
+
+                using (Stream stream = errResp.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(stream);
+                    responseMessage = reader.ReadToEnd();
+                }
+
+                throw new Exception(responseMessage);
+            }
         }
     }
 }

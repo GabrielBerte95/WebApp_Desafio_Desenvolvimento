@@ -10,6 +10,7 @@ namespace WebApp_Desafio_BackEnd.Business
     public class DepartamentosBLL
     {
         private DepartamentosDAL dal = new DepartamentosDAL();
+        private ChamadosDAL chamadosDal = new ChamadosDAL();
 
         public IEnumerable<Departamento> ListarDepartamentos()
         {
@@ -39,6 +40,9 @@ namespace WebApp_Desafio_BackEnd.Business
 
         public bool ExcluirDepartamento(int idDepartamento)
         {
+            if (chamadosDal.ExisteChamadoPorDepartamento(idDepartamento))
+                throw new ArgumentException("Não é possível excluir o Departamento pois existem Chamados vinculados a ele.");
+
             return dal.ExcluirDepartamento(idDepartamento);
         }
     }

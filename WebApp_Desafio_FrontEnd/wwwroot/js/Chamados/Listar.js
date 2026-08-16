@@ -67,10 +67,12 @@
                         url: config.contextPath + 'Chamados/Excluir/' + idRegistro,
                         type: 'DELETE',
                         contentType: 'application/json',
-                        error: function (result) {
+                        error: function (jqXHR) {
+
+                            let mensagem = (jqXHR.responseJSON && jqXHR.responseJSON.Message) || jqXHR.responseText || "Ocorreu um erro ao processar a solicitação.";
 
                             Swal.fire({
-                                text: result,
+                                text: mensagem,
                                 confirmButtonText: 'OK',
                                 icon: 'error'
                             });

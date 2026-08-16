@@ -186,5 +186,26 @@ namespace WebApp_Desafio_BackEnd.DataAccess
 
             return (regsAfetados > 0);
         }
+
+        public bool ExisteChamadoPorDepartamento(int idDepartamento)
+        {
+            int total = 0;
+
+            using (SQLiteConnection dbConnection = new SQLiteConnection(CONNECTION_STRING))
+            {
+                using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
+                {
+                    dbCommand.CommandText = "SELECT COUNT(*) FROM chamados WHERE IdDepartamento = @IdDepartamento";
+                    dbCommand.Parameters.AddWithValue("@IdDepartamento", idDepartamento);
+
+                    dbConnection.Open();
+                    total = Convert.ToInt32(dbCommand.ExecuteScalar());
+                    dbConnection.Close();
+                }
+
+            }
+
+            return total > 0;
+        }
     }
 }
