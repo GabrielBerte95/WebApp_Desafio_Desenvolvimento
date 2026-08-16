@@ -42,8 +42,22 @@ namespace WebApp_Desafio_BackEnd.Business
             if (!Validator.TryValidateObject(chamado, new ValidationContext(chamado), validationResults, true))
                 throw new ArgumentException(string.Join(" ", validationResults.Select(r => r.ErrorMessage)));
 
-            if (ID == 0 && DataAbertura.Date < DateTime.Today)
-                throw new ArgumentException("A Data de Abertura não pode ser retroativa.");
+            if (DataAbertura.Date < DateTime.Today)
+            {
+                // Chamados existentes podem continuar com uma data já retroativa se ela
+                // não estiver sendo alterada; o que não pode acontecer é ajustar (criar ou
+                // mudar) a Data de Abertura para um valor retroativo.
+                bool dataFoiAlterada = true;
+
+                if (ID != 0)
+                {
+                    var chamadoAtual = dal.ObterChamado(ID);
+                    dataFoiAlterada = (chamadoAtual == null) || (chamadoAtual.DataAbertura.Date != DataAbertura.Date);
+                }
+
+                if (dataFoiAlterada)
+                    throw new ArgumentException("A Data de Abertura não pode ser retroativa.");
+            }
 
             return dal.GravarChamado(ID, Assunto, Solicitante, IdDepartamento, DataAbertura);
         }
