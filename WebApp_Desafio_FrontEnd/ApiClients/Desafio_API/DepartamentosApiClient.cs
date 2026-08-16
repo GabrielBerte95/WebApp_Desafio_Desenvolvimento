@@ -66,7 +66,7 @@ namespace WebApp_Desafio_FrontEnd.ApiClients.Desafio_API
                 { "TokenAutenticacao", tokenAutenticacao }
             };
 
-            var response = base.Post($"{desafioApiUrl}{departamentosGravarUrl}", departamento, headers);
+            var response = base.Post($"{desafioApiUrl}{departamentosGravarUrl}", departamento, headers: headers);
 
             base.EnsureSuccessStatusCode(response);
 
