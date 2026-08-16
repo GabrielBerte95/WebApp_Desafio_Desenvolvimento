@@ -15,7 +15,12 @@ namespace WebApp_Desafio_API.Controllers
     [Route("api/[controller]")]
     public class ChamadosController : Controller
     {
-        private ChamadosBLL bll = new ChamadosBLL();
+        private readonly ChamadosBLL bll;
+
+        public ChamadosController(ChamadosBLL bll)
+        {
+            this.bll = bll;
+        }
 
         /// <summary>
         /// Lista todos os chamados
