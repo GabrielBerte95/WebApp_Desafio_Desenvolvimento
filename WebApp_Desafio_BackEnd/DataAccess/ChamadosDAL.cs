@@ -90,7 +90,9 @@ namespace WebApp_Desafio_BackEnd.DataAccess
                         "FROM chamados " +
                         "INNER JOIN departamentos " +
                         "   ON chamados.IdDepartamento = departamentos.ID " +
-                        $"WHERE chamados.ID = {idChamado}";
+                        "WHERE chamados.ID = @ID";
+
+                    dbCommand.Parameters.AddWithValue("@ID", idChamado);
 
                     dbConnection.Open();
 
@@ -174,7 +176,8 @@ namespace WebApp_Desafio_BackEnd.DataAccess
             {
                 using (SQLiteCommand dbCommand = dbConnection.CreateCommand())
                 {
-                    dbCommand.CommandText = $"DELETE FROM chamados WHERE ID = {idChamado}";
+                    dbCommand.CommandText = "DELETE FROM chamados WHERE ID = @ID";
+                    dbCommand.Parameters.AddWithValue("@ID", idChamado);
 
                     dbConnection.Open();
                     regsAfetados = dbCommand.ExecuteNonQuery();

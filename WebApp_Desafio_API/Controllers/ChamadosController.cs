@@ -117,7 +117,7 @@ namespace WebApp_Desafio_API.Controllers
             try
             {
                 if (request == null)
-                    throw new ArgumentNullException("Request não informado.");
+                    throw new ArgumentException("Request não informado.");
 
                 var resultado = this.bll.GravarChamado(request.id,
                                                        request.assunto,
